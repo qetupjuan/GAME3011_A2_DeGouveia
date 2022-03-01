@@ -10,7 +10,6 @@ public class GameManagerSc : MonoBehaviour
     public TextMeshProUGUI timeText;
     public TextMeshProUGUI numberSyringes;
     public GameObject losePanel;
-    public GameObject winPanel;
     public GameObject Lock;
     public float time = 50f;
     public float timeLimit;

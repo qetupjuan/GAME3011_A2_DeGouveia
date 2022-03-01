@@ -28,18 +28,13 @@ public class LockpickBehaviour : MonoBehaviour
         animator = GetComponent<Animator>();
         gameManager = FindObjectOfType<GameManagerSc>();
     }
-    // Distance range for the target
+
     float RotationMargin
     {
         get
         {
             return 1f - Mathf.Abs(sweetSpot - SyringeMovement) + margin;
         }
-    }
-
-    private void Start()
-    {
-        
     }
 
     void Init()
@@ -55,31 +50,6 @@ public class LockpickBehaviour : MonoBehaviour
         tension = 0;
         isAttempting = false;
     }
-    public float SyringeMovement
-    {
-        get 
-        { 
-            return syringeMovement; 
-        }
-        set
-        { 
-            syringeMovement = value;
-            syringeMovement = Mathf.Clamp(syringeMovement, 0f, 1f);
-        }
-    }
-
-    public float HolePosition
-    {
-        get 
-        { 
-            return holePosition; 
-        }
-        set
-        {
-            holePosition = value;
-            holePosition = Mathf.Clamp(holePosition, 0f, RotationMargin);
-        }
-    }
 
     private void Update()
     {
@@ -92,7 +62,6 @@ public class LockpickBehaviour : MonoBehaviour
         Hole();
         UpdateAnimator();
     }
-
 
     private void Syringe()
     {
@@ -115,9 +84,35 @@ public class LockpickBehaviour : MonoBehaviour
             tension += Time.deltaTime * failRange;
             if (tension > 1f)
             {
+                Debug.Log("Syringe broke");
                 totalSyringes--;
                 SyringeBreak();
             }
+        }
+    }
+    public float SyringeMovement
+    {
+        get
+        {
+            return syringeMovement;
+        }
+        set
+        {
+            syringeMovement = value;
+            syringeMovement = Mathf.Clamp(syringeMovement, 0f, 1f);
+        }
+    }
+
+    public float HolePosition
+    {
+        get
+        {
+            return holePosition;
+        }
+        set
+        {
+            holePosition = value;
+            holePosition = Mathf.Clamp(holePosition, 0f, RotationMargin);
         }
     }
     private void SyringeBreak()
@@ -129,7 +124,8 @@ public class LockpickBehaviour : MonoBehaviour
     private void Cracked()
     {
         isAttempting = true;
-        Debug.Log("win");
+        Debug.Log("Win!");
+        //gameManager.GetComponent<GameManagerSc>().winPanel = true;
     }
 
     private void UpdateAnimator()
