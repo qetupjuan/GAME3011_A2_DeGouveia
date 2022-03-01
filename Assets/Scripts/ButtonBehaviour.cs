@@ -1,18 +1,34 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
+using TMPro;
 
 public class ButtonBehaviour : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void MenuButton()
     {
-        
+        SceneManager.LoadScene("Menu");
     }
 
-    // Update is called once per frame
-    void Update()
+    public void EasyButton()
     {
-        
+        SceneManager.LoadScene("EasyScene");
+    }
+
+    public void MediumButton()
+    {
+        SceneManager.LoadScene("MediumScene");
+    }
+
+    public void HardButton()
+    {
+        SceneManager.LoadScene("HardScene");
+    }
+
+    public void ExitButton()
+    {
+        Application.Quit();
     }
 }

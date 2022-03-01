@@ -6,58 +6,63 @@ using UnityEngine.Events;
 
 public class LockpickBehaviour : MonoBehaviour
 {
-    float syringeMovement;
-    float holePosition;
-    float tension = 0f;
+    public GameManagerSc gameManager;
+    public float syringeMovement;
+    public float holePosition;
+    public float tension = 0f;
+    public float sweetSpot;
     [SerializeField]
-    float syringeSpeed = 1f, holeSpeed = 0.8f, retentionSpeed = 0.4f, failRange = 1f;
+    public float syringeSpeed = 5f, holeSpeed = 0.8f, 
+    retentionSpeed = 0.4f, failRange = 1f, margin = 0.1f;
 
-    Animator animator;
-    bool paused = false;
-    bool shaking;
+    public Animator animator;
+    public bool isAttempting = false;
+    public bool shaking;
 
-    int totalSyringes = 5;
-
-
-    float targetPosition;
-    [SerializeField] float margin = 0.1f;
-    float MaxRotationDistance
-    {
-        get
-        {
-            return 1f - Mathf.Abs(targetPosition - SyringeMovement) + margin;
-        }
-    }
+    public int totalSyringes = 3;
+    public int currentSyringes;
 
     private void Awake()
     {
+        Init();
         animator = GetComponent<Animator>();
+        gameManager = FindObjectOfType<GameManagerSc>();
+    }
+    // Distance range for the target
+    float RotationMargin
+    {
+        get
+        {
+            return 1f - Mathf.Abs(sweetSpot - SyringeMovement) + margin;
+        }
     }
 
     private void Start()
     {
-        Init();
+        
     }
 
     void Init()
     {
         Reset();
-
-        targetPosition = UnityEngine.Random.value;
+        currentSyringes = totalSyringes;
+        sweetSpot = UnityEngine.Random.Range(0f, 1f);
     }
     public void Reset()
     {
         HolePosition = 0;
         SyringeMovement = 0.5f;
         tension = 0;
-        totalSyringes--;
-        paused = false;
+        isAttempting = false;
     }
     public float SyringeMovement
     {
-        get { return syringeMovement; }
+        get 
+        { 
+            return syringeMovement; 
+        }
         set
-        {
+        { 
             syringeMovement = value;
             syringeMovement = Mathf.Clamp(syringeMovement, 0f, 1f);
         }
@@ -65,17 +70,20 @@ public class LockpickBehaviour : MonoBehaviour
 
     public float HolePosition
     {
-        get { return holePosition; }
+        get 
+        { 
+            return holePosition; 
+        }
         set
         {
             holePosition = value;
-            holePosition = Mathf.Clamp(holePosition, 0f, MaxRotationDistance);
+            holePosition = Mathf.Clamp(holePosition, 0f, RotationMargin);
         }
     }
 
     private void Update()
     {
-        if (paused == true) { return; }
+        if (isAttempting == true) { return; }
         if (Input.GetAxisRaw("Vertical") == 0)
         {
             Syringe();
@@ -88,38 +96,39 @@ public class LockpickBehaviour : MonoBehaviour
 
     private void Syringe()
     {
-        SyringeMovement += Input.GetAxisRaw("Horizontal") * Time.deltaTime * syringeSpeed;
+        SyringeMovement += Input.GetAxisRaw("Mouse X") * Time.deltaTime * syringeSpeed;
     }
     private void Hole()
     {
         HolePosition -= retentionSpeed * Time.deltaTime;
         HolePosition += Mathf.Abs(Input.GetAxisRaw("Vertical")) * Time.deltaTime * holeSpeed;
-        if (HolePosition > 0.98f)
+        if (HolePosition > 0.99999f)
         {
             Cracked();
         }
     }
     private void AggressivelyShaking()
     {
-        shaking = MaxRotationDistance - HolePosition < 0.03f;
+        shaking = RotationMargin - HolePosition < 0.03f;
         if (shaking)
         {
             tension += Time.deltaTime * failRange;
             if (tension > 1f)
             {
+                totalSyringes--;
                 SyringeBreak();
             }
         }
     }
     private void SyringeBreak()
     {
-        paused = true;
+        isAttempting = true;
         Reset();
     }
 
     private void Cracked()
     {
-        paused = true;
+        isAttempting = true;
         Debug.Log("win");
     }
 
@@ -128,9 +137,5 @@ public class LockpickBehaviour : MonoBehaviour
         animator.SetFloat("SyringeMovement", SyringeMovement);
         animator.SetFloat("HolePosition", HolePosition);
         animator.SetBool("isShaking", shaking);
-    }
-    public void OpenLock(int level, Component tg)
-    {
-
     }
 }
